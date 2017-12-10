@@ -37,7 +37,7 @@ namespace System.Data.SqlClient.Tests
             Assert.False(list.IsReadOnly);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void Methods_NullParameterPassed_ThrowsArgumentNullException()
         {
             SqlBulkCopyColumnMappingCollection collection = CreateCollection();
@@ -68,7 +68,7 @@ namespace System.Data.SqlClient.Tests
             Assert.Throws<ArgumentNullException>(() => list.Remove(null));
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void Members_InvalidRange_ThrowsArgumentOutOfRangeException()
         {
             SqlBulkCopyColumnMappingCollection collection = CreateCollection();
@@ -140,7 +140,7 @@ namespace System.Data.SqlClient.Tests
             Assert.Equal("dest", item.DestinationColumn);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void Add_InvalidItems_ThrowsInvalidOperationException()
         {
             SqlBulkCopyColumnMappingCollection collection = CreateCollection();
@@ -168,7 +168,7 @@ namespace System.Data.SqlClient.Tests
             list.Insert(0, bogus);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void GetEnumerator_NoItems_EmptyEnumerator()
         {
             SqlBulkCopyColumnMappingCollection collection = CreateCollection();
@@ -178,7 +178,7 @@ namespace System.Data.SqlClient.Tests
             Assert.Throws<InvalidOperationException>(() => e.Current);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void GetEnumerator_ItemsAdded_AllItemsReturnedAndEnumeratorBehavesAsExpected()
         {
             var item1 = new SqlBulkCopyColumnMapping(0, 0);
@@ -239,7 +239,7 @@ namespace System.Data.SqlClient.Tests
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void GetEnumerator_ModifiedCollectionDuringEnumeration_ThrowsInvalidOperationException()
         {
             SqlBulkCopyColumnMappingCollection collection = CreateCollection();
@@ -300,7 +300,7 @@ namespace System.Data.SqlClient.Tests
             Assert.Same(item3, array2[2]);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void CopyTo_InvalidArrayType_Throws()
         {
             var item1 = new SqlBulkCopyColumnMapping(0, 0);
@@ -437,7 +437,7 @@ namespace System.Data.SqlClient.Tests
             Assert.Equal(0, list.Count);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void Remove_BehavesAsExpected()
         {
             var item1 = new SqlBulkCopyColumnMapping(0, 0);

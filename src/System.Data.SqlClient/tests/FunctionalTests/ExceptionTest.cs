@@ -19,7 +19,7 @@ namespace System.Data.SqlClient.Tests
         private const string execReaderFailedMessage = "ExecuteReader requires an open and available Connection. The connection's current state is closed.";
         private const string orderIdQuery = "select orderid from orders where orderid < 10250";
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void ExceptionTests()
         {
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(connectionString);
@@ -30,7 +30,7 @@ namespace System.Data.SqlClient.Tests
             VerifyConnectionFailure<SqlException>(() => GenerateConnectionException(badBuilder.ConnectionString), sqlsvrBadConn, VerifyException);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void VariousExceptionTests()
         {
             // Test exceptions - makes sure they are only thrown from upper layers
@@ -47,7 +47,7 @@ namespace System.Data.SqlClient.Tests
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void IndependentConnectionExceptionTestOpenConnection()
         {
             // Test exceptions for existing connection to ensure proper exception and call stack
@@ -60,7 +60,7 @@ namespace System.Data.SqlClient.Tests
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void IndependentConnectionExceptionTestExecuteReader()
         {
             // Test exceptions for existing connection to ensure proper exception and call stack
@@ -76,7 +76,7 @@ namespace System.Data.SqlClient.Tests
             }
         }
 
-        [Theory]
+        [Theory(Skip = "Skip")]
         [InlineData(@"np:\\.\pipe\sqlbad\query")]
         [InlineData(@"np:\\.\pipe\MSSQL$NonExistentInstance\sql\query")]
         [InlineData(@"\\.\pipe\sqlbad\query")]
@@ -139,7 +139,7 @@ namespace System.Data.SqlClient.Tests
             OpenBadConnection(builder.ConnectionString, invalidConnStringError);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         [SkipOnTargetFramework(~TargetFrameworkMonikers.Uap)]
         public static void LocalDBNotSupportedOnUapTest()
         {

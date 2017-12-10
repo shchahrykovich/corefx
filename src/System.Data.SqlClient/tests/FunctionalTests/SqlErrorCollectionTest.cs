@@ -34,7 +34,7 @@ namespace System.Data.SqlClient.Tests
             Assert.Same(c[0], c[0]);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void Indexer_Throws()
         {
             SqlErrorCollection c = CreateCollection();
@@ -69,13 +69,13 @@ namespace System.Data.SqlClient.Tests
             Assert.Null(destination[4]);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void CopyTo_Throws()
         {
             ValidateCopyToThrows((collection, array, index) => collection.CopyTo(array, index));
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void CopyTo_NonGeneric_Throws()
         {
             ValidateCopyToThrows((collection, array, index) => ((ICollection)collection).CopyTo(array, index), c =>
@@ -100,7 +100,7 @@ namespace System.Data.SqlClient.Tests
             additionalValidation?.Invoke(c);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void GetEnumerator_Success()
         {
             SqlErrorCollection c = CreateCollection();

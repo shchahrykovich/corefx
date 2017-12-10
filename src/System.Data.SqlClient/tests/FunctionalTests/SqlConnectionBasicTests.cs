@@ -70,7 +70,7 @@ namespace System.Data.SqlClient.Tests
             Assert.False(new SqlConnectionStringBuilder(con.ConnectionString).IntegratedSecurity);
         }
 
-        [Fact]
+        [Fact(Skip = "Skip")]
         public void SqlConnectionInvalidParameters()
         {
             Assert.Throws<ArgumentException>(() => new SqlConnection("Timeout=null;"));
