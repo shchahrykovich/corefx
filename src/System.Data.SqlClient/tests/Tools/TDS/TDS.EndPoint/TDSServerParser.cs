@@ -110,6 +110,18 @@ namespace Microsoft.SqlServer.TDS.EndPoint
                             responseMessages = Server.OnFederatedAuthenticationTokenMessage(Session, MessageBeingReceived);
                             break;
                         }
+                    case TDSMessageType.RPC:
+                    {
+                        // Call into the subscriber to process the packet
+                        responseMessages = Server.OnRPCRequest(Session, MessageBeingReceived);
+                        break;
+                    }
+                    case TDSMessageType.TransactionManager:
+                    {
+                        // Call into the subscriber to process the packet
+                        responseMessages = Server.OnTransactionManagerRequest(Session, MessageBeingReceived);
+                        break;
+                    }
                     default:
                         {
                             // New code is needed to process this message

@@ -73,6 +73,14 @@
     <Compile Include="Row\TDSNBCRowToken.cs" />
     <Compile Include="Row\TDSRowToken.cs" />
     <Compile Include="Row\TDSRowTokenBase.cs" />
+    <Compile Include="RPC\TDSReturnValueFlags.cs" />
+    <Compile Include="RPC\TDSReturnValueStatus.cs" />
+    <Compile Include="RPC\TDSReturnValueToken.cs" />
+    <Compile Include="RPC\TDSRPCRequestOptionFlags.cs" />
+    <Compile Include="RPC\TDSRPCRequestParameter.cs" />
+    <Compile Include="RPC\TDSRPCRequestStatusFlags.cs" />
+    <Compile Include="RPC\TDSRPCRequestToken.cs" />
+    <Compile Include="RPC\TDSRPCRequestTokenProcID.cs" />
     <Compile Include="SessionState\TDSSessionRecoveryData.cs" />
     <Compile Include="SessionState\TDSSessionStateContextInfoOption.cs" />
     <Compile Include="SessionState\TDSSessionStateDateFirstDateFormatOption.cs" />
@@ -107,6 +115,8 @@
     <Compile Include="TDSUtilities.cs" />
     <Compile Include="TDSVersion.cs" />
     <Compile Include="TransactionIsolationLevelType.cs" />
+    <Compile Include="Transactions\TDSTransMgrReqRequestType.cs" />
+    <Compile Include="Transactions\TDSTransMgrReqToken.cs" />
   </ItemGroup>
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.targets))\dir.targets" />
 </Project>

@@ -298,6 +298,30 @@ namespace Microsoft.SqlServer.TDS.EnvChange
                         break;
                     }
                 case TDSEnvChangeTokenType.SQLCollation:
+                {
+                    // Write new value length
+                    cache.WriteByte((byte) (NewValue != null ? ((byte[]) NewValue).Length : 0));
+
+                    // Check if we have a new value
+                    if (NewValue != null)
+                    {
+                        // Write new value
+                        cache.Write((byte[]) NewValue, 0, ((byte[]) NewValue).Length);
+                    }
+
+                    // Write old value length
+                    cache.WriteByte((byte) (OldValue != null ? ((byte[]) OldValue).Length : 0));
+
+                    // Check if we have a old value
+                    if (OldValue != null)
+                    {
+                        // Write old value
+                        cache.Write((byte[]) OldValue, 0, ((byte[]) OldValue).Length);
+                    }
+
+                    break;
+                }
+                case TDSEnvChangeTokenType.BeginTransaction:
                     {
                         // Write new value length
                         cache.WriteByte((byte)(NewValue != null ? ((byte[])NewValue).Length : 0));
@@ -309,22 +333,28 @@ namespace Microsoft.SqlServer.TDS.EnvChange
                             cache.Write((byte[])NewValue, 0, ((byte[])NewValue).Length);
                         }
 
-                        // Write old value length
+                        cache.WriteByte(0);
+                        break;
+                    }
+                case TDSEnvChangeTokenType.CommitTransaction:
+                    {
+                        // Write new value length
+                        cache.WriteByte(0);
+
                         cache.WriteByte((byte)(OldValue != null ? ((byte[])OldValue).Length : 0));
 
-                        // Check if we have a old value
+                        // Check if we have a new value
                         if (OldValue != null)
                         {
-                            // Write old value
+                            // Write new value
                             cache.Write((byte[])OldValue, 0, ((byte[])OldValue).Length);
                         }
-
                         break;
                     }
                 default:
-                    {
-                        throw new Exception("Unrecognized environment change type");
-                    }
+                {
+                    throw new Exception("Unrecognized environment change type");
+                }
             }
 
             // Write token identifier

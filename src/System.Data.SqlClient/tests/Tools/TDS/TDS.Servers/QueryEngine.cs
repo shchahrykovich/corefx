@@ -8,9 +8,11 @@ using System.IO;
 using Microsoft.SqlServer.TDS.ColMetadata;
 using Microsoft.SqlServer.TDS.Done;
 using Microsoft.SqlServer.TDS.EndPoint;
+using Microsoft.SqlServer.TDS.EnvChange;
 using Microsoft.SqlServer.TDS.Row;
 using Microsoft.SqlServer.TDS.SQLBatch;
 using Microsoft.SqlServer.TDS.Info;
+using TDS.Transactions;
 
 namespace Microsoft.SqlServer.TDS.Servers
 {
@@ -358,6 +360,36 @@ namespace Microsoft.SqlServer.TDS.Servers
 
             // Response collection will contain only one message
             return new TDSMessageCollection(responseMessage);
+        }
+
+        public virtual TDSMessageCollection ExecuteRPC(ITDSServerSession session, TDSMessage message)
+        {
+            TDSDoneToken doneToken = new TDSDoneToken(TDSDoneTokenStatusType.Final | TDSDoneTokenStatusType.Count, TDSDoneTokenCommandType.Select, 0);
+            return new TDSMessageCollection(new TDSMessage(TDSMessageType.Response, doneToken));
+        }
+
+        public virtual TDSMessageCollection ProcessTransactions(ITDSServerSession session, TDSMessage message)
+        {
+            TDSTransMgrReqToken transaction = message[0] as TDSTransMgrReqToken;
+
+            TDSDoneToken doneToken = new TDSDoneToken(TDSDoneTokenStatusType.TransactionInProgress);
+
+            if (transaction.RequestType == TDSTransMgrReqRequestType.TM_BEGIN_XACT)
+            {
+                var guid = Guid.NewGuid().ToByteArray();
+                var tran = new TDSEnvChangeToken(TDSEnvChangeTokenType.BeginTransaction, new byte[]{ guid[0], guid[1], guid[2], guid[3],
+                guid[4], guid[5], guid[6], guid[7]}, 0);
+                return new TDSMessageCollection(new TDSMessage(TDSMessageType.Response, tran, doneToken));
+            }
+            else if (transaction.RequestType == TDSTransMgrReqRequestType.TM_COMMIT_XACT)
+            {
+                var guid = Guid.NewGuid().ToByteArray();
+                var tran = new TDSEnvChangeToken(TDSEnvChangeTokenType.CommitTransaction, 0, new byte[]{ guid[0], guid[1], guid[2], guid[3],
+                guid[4], guid[5], guid[6], guid[7]});
+                return new TDSMessageCollection(new TDSMessage(TDSMessageType.Response, tran, doneToken));
+            }
+
+            throw new NotImplementedException();
         }
 
 
