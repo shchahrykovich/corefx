@@ -281,6 +281,17 @@ namespace Microsoft.SqlServer.TDS.ColMetadata
                     {
                         // YukonTextType.Len + YukonTextType.tdsCollationInfo + YukonTextType.cParts
                         // cb = sizeof(LONG) + sizeof(TDSCOLLATION) + sizeof(BYTE);
+
+                        // Cast to type specific information
+                        TDSShilohVarCharColumnSpecific typedSpecific = DataTypeSpecific as TDSShilohVarCharColumnSpecific;
+
+                        // Write length
+                        TDSUtilities.WriteUInt(destination, typedSpecific.Length);
+
+                        // Write collation
+                        TDSUtilities.WriteUInt(destination, typedSpecific.Collation.WCID);
+                        destination.WriteByte(typedSpecific.Collation.SortID);
+
                         break;
                     }
                 case TDSDataType.Image:

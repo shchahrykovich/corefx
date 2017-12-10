@@ -635,11 +635,19 @@ namespace Microsoft.SqlServer.TDS.Row
                         }
                         else
                         {
+                            //TextPtrs
+                            destination.WriteByte(1);
+                            destination.WriteByte(0);
+
+                            //TEXT_TIME_STAMP_LEN = 8 bytes
+                            TDSUtilities.WriteUInt(destination, 0);
+                            TDSUtilities.WriteUInt(destination, 0);
+
                             // Get bytes
                             byte[] textBytes = Encoding.Unicode.GetBytes((string)data);
 
                             // One data length
-                            TDSUtilities.WriteULong(destination, (ulong)textBytes.Length);
+                            TDSUtilities.WriteUInt(destination, (uint)textBytes.Length);
 
                             // Data
                             destination.Write(textBytes, 0, textBytes.Length);

@@ -11,8 +11,12 @@
   <ItemGroup>
     <Compile Include="CloneTests.cs" />
     <Compile Include="BaseProviderAsyncTest\BaseProviderAsyncTest.cs" />
-    <Compile Include="BaseProviderAsyncTest\MockCommand.cs" />
-    <Compile Include="BaseProviderAsyncTest\MockConnection.cs" />
+    <Compile Include="BaseProviderAsyncTest\MockCommand.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BaseProviderAsyncTest\MockConnection.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="BaseProviderAsyncTest\MockDataReader.cs" />
     <Compile Include="DiagnosticTest.cs" />
     <Compile Include="AmbientTransactionFailureTest.cs" />
@@ -24,6 +28,7 @@
     <Compile Include="SqlClientFactoryTest.cs" />
     <Compile Include="SqlConnectionTest.RetrieveStatistics.cs" />
     <Compile Include="SqlErrorCollectionTest.cs" />
+    <Compile Include="SqlQueryTest.cs" />
     <Compile Include="TcpDefaultForAzureTest.cs" />
     <Compile Include="SqlConnectionBasicTests.cs" />
     <Compile Include="TestTdsServer.cs" />
