@@ -163,6 +163,12 @@ namespace Microsoft.SqlServer.TDS.Servers
                 // Delegate to current database response
                 responseMessage = _PrepareMyTableNameDescriptionResponse(session);
             }
+            else if (lowerBatchText.Contains("xml-field")
+                && lowerBatchText.Contains("mytable"))  // SELECT [xml-field] FROM MyTable
+            {
+                // Delegate to current database response
+                responseMessage = _PrepareMyTableXmlFieldResponse(session);
+            }
             else if (lowerBatchText.Contains("dbcc")
                 && lowerBatchText.Contains("tracestatus"))   // dbcc tracestatus()
             {
@@ -1062,6 +1068,41 @@ namespace Microsoft.SqlServer.TDS.Servers
 
             // Add row
             rowToken.Data.Add((int)1);
+
+            // Log response
+            TDSUtilities.Log(Log, "Response", rowToken);
+
+            // Create DONE token
+            TDSDoneToken doneToken = new TDSDoneToken(TDSDoneTokenStatusType.Final | TDSDoneTokenStatusType.Count, TDSDoneTokenCommandType.Select, 1);
+
+            // Log response
+            TDSUtilities.Log(Log, "Response", doneToken);
+
+            // Serialize tokens into the message
+            return new TDSMessage(TDSMessageType.Response, metadataToken, rowToken, doneToken);
+        }
+
+        private TDSMessage _PrepareMyTableXmlFieldResponse(ITDSServerSession session)
+        {
+            // Prepare result metadata
+            TDSColMetadataToken metadataToken = new TDSColMetadataToken();
+
+            // Start the first column
+            TDSColumnData column = new TDSColumnData();
+            column.DataType = TDSDataType.Xml;
+            column.Name = "xml-field";
+
+            // Add a column to the response
+            metadataToken.Columns.Add(column);
+
+            // Log response
+            TDSUtilities.Log(Log, "Response", metadataToken);
+
+            // Prepare result data
+            TDSRowToken rowToken = new TDSRowToken(metadataToken);
+
+            // Add row
+            rowToken.Data.Add("<books><book><id>2</id></book></books>");
 
             // Log response
             TDSUtilities.Log(Log, "Response", rowToken);

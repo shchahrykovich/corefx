@@ -689,13 +689,16 @@ namespace Microsoft.SqlServer.TDS.Row
                         else
                         {
                             // Get bytes
-                            byte[] bytes = Encoding.UTF8.GetBytes((string)data);
+                            byte[] bytes = Encoding.Unicode.GetBytes((string)data);
 
                             // One data length
-                            TDSUtilities.WriteUShort(destination, (ushort)bytes.Length);
+                            TDSUtilities.WriteULong(destination, (ulong)bytes.Length);
+                            TDSUtilities.WriteUInt(destination, (uint)bytes.Length);
 
                             // Data
                             destination.Write(bytes, 0, bytes.Length);
+
+                            TDSUtilities.WriteUInt(destination, (uint)0);
                         }
 
                         break;

@@ -34,5 +34,29 @@ namespace SqlConnectionBasicTests
                 }
             }
         }
+
+        [Fact]
+        public void SelectXmlRow()
+        {
+            using (TestTdsServer server = TestTdsServer.StartTestServer())
+            {
+                using (SqlConnection conn = new SqlConnection(server.ConnectionString))
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT [xml-field] FROM MyTable";
+
+                    conn.Open();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var xml = reader.GetSqlXml(0);
+                            Assert.Equal("<books><book><id>2</id></book></books>", xml.Value);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
