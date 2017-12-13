@@ -156,15 +156,12 @@ namespace Microsoft.SqlServer.TDS.Servers
                 // Delegate to current database response
                 responseMessage = _PrepareDatabaseResponse(session);
             }
-            else if (lowerBatchText.Contains("name")
-                && lowerBatchText.Contains("description")
-                && lowerBatchText.Contains("mytable"))  // SELECT [name], [description] FROM MyTable
+            else if (lowerBatchText.Equals("SELECT [name], [description] FROM MyTable", StringComparison.OrdinalIgnoreCase))
             {
                 // Delegate to current database response
                 responseMessage = _PrepareMyTableNameDescriptionResponse(session);
             }
-            else if (lowerBatchText.Contains("xml-field")
-                && lowerBatchText.Contains("mytable"))  // SELECT [xml-field] FROM MyTable
+            else if (lowerBatchText.Equals("SELECT [xml-field] FROM MyTable", StringComparison.OrdinalIgnoreCase))
             {
                 // Delegate to current database response
                 responseMessage = _PrepareMyTableXmlFieldResponse(session);
@@ -379,6 +376,7 @@ namespace Microsoft.SqlServer.TDS.Servers
         public virtual TDSMessageCollection ExecuteRPC(ITDSServerSession session, TDSMessage message)
         {
             TDSDoneToken doneToken = new TDSDoneToken(TDSDoneTokenStatusType.Final | TDSDoneTokenStatusType.Count, TDSDoneTokenCommandType.Select, 0);
+
             return new TDSMessageCollection(new TDSMessage(TDSMessageType.Response, doneToken));
         }
 

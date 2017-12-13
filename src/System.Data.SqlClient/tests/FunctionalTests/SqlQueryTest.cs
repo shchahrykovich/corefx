@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlClient.Tests;
 using System.Linq;
@@ -54,6 +55,32 @@ namespace SqlConnectionBasicTests
                             var xml = reader.GetSqlXml(0);
                             Assert.Equal("<books><book><id>2</id></book></books>", xml.Value);
                         }
+                    }
+                }
+            }
+        }
+
+        [Fact]
+        public void SendXmlRow()
+        {
+            using (TestTdsServer server = TestTdsServer.StartTestServer())
+            {
+                using (SqlConnection conn = new SqlConnection(server.ConnectionString))
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT [xml-field] FROM MyTable WHERE [old-xml-field] = @OldXmlField";
+
+                    var oldFieldParameter = new SqlParameter("@OldXmlField", SqlDbType.Xml)
+                    {
+                        Value = "<test></test>"
+                    };
+                    cmd.Parameters.Add(oldFieldParameter);
+
+                    conn.Open();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        Assert.Equal(false, reader.Read());
                     }
                 }
             }

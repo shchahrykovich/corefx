@@ -362,6 +362,30 @@ namespace Microsoft.SqlServer.TDS.Row
                         // Convert to type
                         return bytes;
                     }
+                case TDSDataType.Xml:
+                    {
+                        bool schema = source.ReadByte() == 1;
+                        if (schema)
+                        {
+                            throw new NotImplementedException();
+                        }
+
+                        ulong stateObject = TDSUtilities.ReadULong(source);
+
+                        int actualLength = TDSUtilities.ReadInt(source);
+
+                        int unicodeFlag = TDSUtilities.ReadUShort(source);
+                        if(unicodeFlag != 0xfeff)
+                        {
+                            throw new NotImplementedException();
+                        }
+
+                        var result = TDSUtilities.ReadString(source, (ushort)actualLength);
+
+                        var b = TDSUtilities.ReadUShort(source);
+                        
+                        return result;
+                    }
                 case TDSDataType.BigBinary:
                     {
                         // Read length
