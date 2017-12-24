@@ -339,6 +339,10 @@ namespace Microsoft.SqlServer.TDS.Servers
                 // Delegate session property query
                 responseMessage = _PrepareContextInfoResponse(session);
             }
+            else if (lowerBatchText == "SELECT [name], [description] FROM Multiple\r\nSELECT [name], [description] FROM Multiple".ToLowerInvariant())
+            {
+                responseMessage = _PrepareMultipleResult(session);
+            }
             else
             {
                 // Create an info token that contains the query received
@@ -1113,6 +1117,55 @@ namespace Microsoft.SqlServer.TDS.Servers
 
             // Serialize tokens into the message
             return new TDSMessage(TDSMessageType.Response, metadataToken, rowToken, doneToken);
+        }
+
+        private TDSMessage _PrepareMultipleResult(ITDSServerSession session)
+        {
+            // Prepare result metadata
+            TDSColMetadataToken metadataToken = new TDSColMetadataToken();
+
+            // Start the first column
+            TDSColumnData column = new TDSColumnData();
+            column.DataType = TDSDataType.NVarChar;
+            column.DataTypeSpecific = new TDSShilohVarCharColumnSpecific(256, new TDSColumnDataCollation(13632521, 52));
+            column.Flags.Updatable = TDSColumnDataUpdatableFlag.ReadOnly;
+            column.Name = "name";
+
+            // Add a column to the response
+            metadataToken.Columns.Add(column);
+
+            // Start the second column
+            column = new TDSColumnData();
+            column.DataType = TDSDataType.NText;
+            column.TableName = new List<string>(new[] { "dbo", "MyTabel", "Description" });
+            column.DataTypeSpecific = new TDSShilohVarCharColumnSpecific(256, new TDSColumnDataCollation(13632521, 52));
+            column.Name = "description";
+
+            // Add a column to the response
+            metadataToken.Columns.Add(column);
+
+            // Log response
+            TDSUtilities.Log(Log, "Response", metadataToken);
+
+            // Prepare result data
+            TDSRowToken rowToken = new TDSRowToken(metadataToken);
+
+            // Add row
+            rowToken.Data.Add("Name-Name");
+            rowToken.Data.Add("Description");
+
+            // Log response
+            TDSUtilities.Log(Log, "Response", rowToken);
+
+            // Create DONE token
+            TDSDoneToken doneTokenMore = new TDSDoneToken(TDSDoneTokenStatusType.More | TDSDoneTokenStatusType.Count, TDSDoneTokenCommandType.Select, 1);
+            TDSDoneToken doneToken = new TDSDoneToken(TDSDoneTokenStatusType.Final | TDSDoneTokenStatusType.Count, TDSDoneTokenCommandType.Select, 1);
+
+            // Log response
+            TDSUtilities.Log(Log, "Response", doneToken);
+
+            // Serialize tokens into the message
+            return new TDSMessage(TDSMessageType.Response, metadataToken, rowToken, doneTokenMore, metadataToken, rowToken, doneToken);
         }
 
         private TDSMessage _PrepareMyTableNameDescriptionResponse(ITDSServerSession session)

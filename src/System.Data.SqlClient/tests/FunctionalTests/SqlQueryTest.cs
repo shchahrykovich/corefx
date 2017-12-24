@@ -13,6 +13,38 @@ namespace SqlConnectionBasicTests
     public class SqlQueryTest
     {
         [Fact]
+        public void SelectMultipleResults()
+        {
+            using (TestTdsServer server = TestTdsServer.StartTestServer())
+            {
+                using (SqlConnection conn = new SqlConnection(server.ConnectionString))
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT [name], [description] FROM Multiple\r\nSELECT [name], [description] FROM Multiple";
+
+                    conn.Open();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+
+                        int results = 0;
+                        do
+                        {
+                            while (reader.Read())
+                            {
+                                Assert.Equal("Name-Name", reader.GetString(0));
+                                Assert.Equal("Description", reader.GetTextReader(1).ReadToEnd());
+                                results++;
+                            }
+                        } while (reader.NextResult());
+
+                        Assert.Equal(2, results);
+                    }
+                }
+            }
+        }
+
+        [Fact]
         public void SelectNTextRow()
         {
             using (TestTdsServer server = TestTdsServer.StartTestServer())
