@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using Microsoft.SqlServer.TDS;
 using Microsoft.SqlServer.TDS.AllHeaders;
-using Microsoft.SqlServer.TDS.Login7;
-using Microsoft.SqlServer.TDS.ColMetadata;
-using Microsoft.SqlServer.TDS.Row;
 
 namespace TDS.RPC
 {

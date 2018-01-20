@@ -440,5 +440,10 @@ namespace Microsoft.SqlServer.TDS
                 log.WriteLine(string.Format("[{0}] {1}", DateTime.Now, text));
             }
         }
+
+        public static short ReadShort(Stream source)
+        {
+            return (short)(source.ReadByte() + (short)(source.ReadByte() << 8));
+        }
     }
 }

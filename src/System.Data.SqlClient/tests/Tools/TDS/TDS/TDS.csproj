@@ -18,6 +18,8 @@
     <Compile Include="AllHeaders\TDSHeaderType.cs" />
     <Compile Include="AllHeaders\TDSAllHeaders.cs" />
     <Compile Include="AutoTDSStream.cs" />
+    <Compile Include="BulkLoad\TDSBulkLoadToken.cs" />
+    <Compile Include="BulkLoad\TDSColMetaData.cs" />
     <Compile Include="ColInfo\TDSColInfoToken.cs" />
     <Compile Include="ColInfo\TDSColumnProperty.cs" />
     <Compile Include="ColInfo\TDSColumnStatus.cs" />

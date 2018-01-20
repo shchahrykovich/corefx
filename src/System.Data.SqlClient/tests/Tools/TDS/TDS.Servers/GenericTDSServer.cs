@@ -403,6 +403,13 @@ namespace Microsoft.SqlServer.TDS.Servers
             return responseMessage;
         }
 
+        public TDSMessageCollection OnBulkRequest(ITDSServerSession session, TDSMessage messageBeingReceived)
+        {
+            // Delegate to the query engine
+            TDSMessageCollection responseMessage = new TDSMessageCollection(new TDSMessage(TDSMessageType.Response, new TDSDoneToken(TDSDoneTokenStatusType.Final)));
+            return responseMessage;
+        }
+
         /// <summary>
         /// Advances one step in SSPI authentication sequence
         /// </summary>

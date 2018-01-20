@@ -161,6 +161,23 @@ namespace Microsoft.SqlServer.TDS.Servers
                 // Delegate to current database response
                 responseMessage = _PrepareMyTableNameDescriptionResponse(session);
             }
+            else if (lowerBatchText.Equals(
+                "insert bulk destination ([description] nvarchar(128) collate latin1_general_ci_as, [description] nvarchar(128) collate latin1_general_ci_as)",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                responseMessage = new TDSMessage(TDSMessageType.Response, new TDSDoneToken(TDSDoneTokenStatusType.Final));
+            }
+            else if (lowerBatchText.Equals(
+                "select @@trancount; set fmtonly on select * from destination set fmtonly off exec ..sp_tablecollations_100 n'.[destination]'",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                responseMessage = _PrepareSqlBulkResponse(session);
+            }
+            else if (lowerBatchText.Equals("SELECT [name], [description] FROM SqlBulk", StringComparison.OrdinalIgnoreCase))
+            {
+                // Delegate to current database response
+                responseMessage = _PrepareMyTableNameDescriptionResponse(session);
+            }
             else if (lowerBatchText.Equals("SELECT [xml-field] FROM MyTable", StringComparison.OrdinalIgnoreCase))
             {
                 // Delegate to current database response
@@ -1168,6 +1185,100 @@ namespace Microsoft.SqlServer.TDS.Servers
             return new TDSMessage(TDSMessageType.Response, metadataToken, rowToken, doneTokenMore, metadataToken, rowToken, doneToken);
         }
 
+        private TDSMessage _PrepareSqlBulkResponse(ITDSServerSession session)
+        {
+            List<TDSPacketToken> messages = new List<TDSPacketToken>();
+
+            // select @@trancount
+            TDSColMetadataToken tranCountMetadaToken = new TDSColMetadataToken();
+            TDSColumnData tranCountColumn = new TDSColumnData();
+            tranCountColumn.DataType = TDSDataType.IntN;
+            tranCountColumn.DataTypeSpecific = (byte)1;
+            tranCountColumn.Flags.IsNullable = true;
+            tranCountColumn.Name = "(no name)";
+            tranCountMetadaToken.Columns.Add(tranCountColumn);
+            TDSRowToken tranCountRow = new TDSRowToken(tranCountMetadaToken);
+            tranCountRow.Data.Add(1);
+            messages.Add(tranCountMetadaToken);
+            messages.Add(tranCountRow);
+            messages.Add(new TDSDoneToken(TDSDoneTokenStatusType.More | TDSDoneTokenStatusType.Count, TDSDoneTokenCommandType.Select, 1));
+
+            //SET FMTONLY ON select * from destination SET FMTONLY OFF
+            TDSColMetadataToken destinationMetadaToken = new TDSColMetadataToken();
+
+            TDSColumnData destinationNameColumn = new TDSColumnData();
+            destinationNameColumn.DataType = TDSDataType.NVarChar;
+            destinationNameColumn.DataTypeSpecific = new TDSShilohVarCharColumnSpecific(256, new TDSColumnDataCollation(13632521, 52));
+            destinationNameColumn.Flags.Updatable = TDSColumnDataUpdatableFlag.ReadOnly;
+            destinationNameColumn.Name = "Name";
+            destinationMetadaToken.Columns.Add(destinationNameColumn);
+
+            TDSColumnData destinationDescrptionColumn = new TDSColumnData();
+            destinationDescrptionColumn.DataType = TDSDataType.NVarChar;
+            destinationDescrptionColumn.DataTypeSpecific = new TDSShilohVarCharColumnSpecific(256, new TDSColumnDataCollation(13632521, 52));
+            destinationDescrptionColumn.Flags.Updatable = TDSColumnDataUpdatableFlag.ReadOnly;
+            destinationDescrptionColumn.Name = "Description";
+            destinationMetadaToken.Columns.Add(destinationDescrptionColumn);
+
+            TDSRowToken destinationRow = new TDSRowToken(destinationMetadaToken);
+            destinationRow.Data.Add("Name");
+            destinationRow.Data.Add("Description");
+            messages.Add(destinationMetadaToken);
+            messages.Add(destinationRow);
+            messages.Add(new TDSDoneToken(TDSDoneTokenStatusType.More | TDSDoneTokenStatusType.Count, TDSDoneTokenCommandType.Select, 1));
+
+
+            //exec ..sp_tablecollations_100 N'.[destination]'
+            TDSColMetadataToken tableCollationMetadaToken = new TDSColMetadataToken();
+            messages.Add(tableCollationMetadaToken);
+
+            TDSColumnData collationColIdColumn = new TDSColumnData();
+            collationColIdColumn.DataType = TDSDataType.IntN;
+            collationColIdColumn.DataTypeSpecific = (byte)1;
+            collationColIdColumn.Flags.IsNullable = true;
+            collationColIdColumn.Name = "colid";
+            tableCollationMetadaToken.Columns.Add(collationColIdColumn);
+
+            TDSColumnData collationNameColumn = new TDSColumnData();
+            collationNameColumn.DataType = TDSDataType.NVarChar;
+            collationNameColumn.DataTypeSpecific = new TDSShilohVarCharColumnSpecific(256, new TDSColumnDataCollation(13632521, 52));
+            collationNameColumn.Flags.Updatable = TDSColumnDataUpdatableFlag.ReadOnly;
+            collationNameColumn.Name = "name";
+            tableCollationMetadaToken.Columns.Add(collationNameColumn);
+
+            TDSColumnData collationTdsCollationColumn = new TDSColumnData();
+            collationTdsCollationColumn.DataType = TDSDataType.NVarChar;
+            collationTdsCollationColumn.DataTypeSpecific = new TDSShilohVarCharColumnSpecific(256, new TDSColumnDataCollation(13632521, 52));
+            collationTdsCollationColumn.Flags.Updatable = TDSColumnDataUpdatableFlag.ReadOnly;
+            collationTdsCollationColumn.Name = "tds_collation";
+            tableCollationMetadaToken.Columns.Add(collationTdsCollationColumn);
+
+            TDSColumnData collationCollationColumn = new TDSColumnData();
+            collationCollationColumn.DataType = TDSDataType.NVarChar;
+            collationCollationColumn.DataTypeSpecific = new TDSShilohVarCharColumnSpecific(256, new TDSColumnDataCollation(13632521, 52));
+            collationCollationColumn.Flags.Updatable = TDSColumnDataUpdatableFlag.ReadOnly;
+            collationCollationColumn.Name = "collation";
+            tableCollationMetadaToken.Columns.Add(collationCollationColumn);
+
+            TDSRowToken collationFirstRow = new TDSRowToken(tableCollationMetadaToken);
+            collationFirstRow.Data.Add(1);
+            collationFirstRow.Data.Add("Name");
+            collationFirstRow.Data.Add("0x0904D00000");
+            collationFirstRow.Data.Add("Latin1_General_CI_AS");
+            messages.Add(collationFirstRow);
+
+            TDSRowToken collationSecondRow = new TDSRowToken(tableCollationMetadaToken);
+            collationSecondRow.Data.Add(2);
+            collationSecondRow.Data.Add("Description");
+            collationSecondRow.Data.Add("0x0904D00000");
+            collationSecondRow.Data.Add("Latin1_General_CI_AS");
+            messages.Add(collationSecondRow);
+
+            messages.Add(new TDSDoneToken(TDSDoneTokenStatusType.Final | TDSDoneTokenStatusType.Count, TDSDoneTokenCommandType.Select, 2));
+
+            // Serialize tokens into the message
+            return new TDSMessage(TDSMessageType.Response, messages.ToArray());
+        }
         private TDSMessage _PrepareMyTableNameDescriptionResponse(ITDSServerSession session)
         {
             // Prepare result metadata

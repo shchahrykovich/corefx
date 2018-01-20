@@ -5,7 +5,7 @@
 namespace Microsoft.SqlServer.TDS.ColMetadata
 {
     /// <summary>
-    /// Metadata associated with decimal/numeric column
+    /// Columns associated with decimal/numeric column
     /// </summary>
     public class TDSDecimalColumnSpecific
     {

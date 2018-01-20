@@ -13,6 +13,30 @@ namespace SqlConnectionBasicTests
     public class SqlQueryTest
     {
         [Fact]
+        public void SqlBulkCopy()
+        {
+            using (TestTdsServer server = TestTdsServer.StartTestServer())
+            {
+                using (SqlConnection conn = new SqlConnection(server.ConnectionString))
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT [name], [description] FROM SqlBulk";
+
+                    conn.Open();
+                    using (var source = cmd.ExecuteReader())
+                    {
+                        using (var copier = new SqlBulkCopy(server.ConnectionString))
+                        {
+                            copier.DestinationTableName = "destination";
+                            copier.WriteToServer(source);
+                        }
+                    }
+                }
+            }
+        }
+
+        [Fact]
         public void SelectMultipleResults()
         {
             using (TestTdsServer server = TestTdsServer.StartTestServer())

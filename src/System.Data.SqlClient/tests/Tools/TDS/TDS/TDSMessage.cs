@@ -10,6 +10,7 @@ using Microsoft.SqlServer.TDS.PreLogin;
 using Microsoft.SqlServer.TDS.SQLBatch;
 using Microsoft.SqlServer.TDS.SSPI;
 using Microsoft.SqlServer.TDS.Authentication;
+using Microsoft.SqlServer.TDS.BulkLoad;
 using TDS.RPC;
 using TDS.Transactions;
 
@@ -288,42 +289,47 @@ namespace Microsoft.SqlServer.TDS
             switch (MessageType)
             {
                 case TDSMessageType.PreLogin:
-                    {
-                        // Create a pre-login token
-                        Add(new TDSPreLoginToken(_dataStream));
-                        break;
-                    }
+                {
+                    // Create a pre-login token
+                    Add(new TDSPreLoginToken(_dataStream));
+                    break;
+                }
                 case TDSMessageType.TDS7Login:
-                    {
-                        // Create and inflate login token
-                        Add(new TDSLogin7Token(_dataStream));
-                        break;
-                    }
+                {
+                    // Create and inflate login token
+                    Add(new TDSLogin7Token(_dataStream));
+                    break;
+                }
                 case TDSMessageType.SSPI:
-                    {
-                        // Create a client-originated SSPI token
-                        Add(new TDSSSPIClientToken(_dataStream, (int)_dataStream.Length));
-                        break;
-                    }
+                {
+                    // Create a client-originated SSPI token
+                    Add(new TDSSSPIClientToken(_dataStream, (int)_dataStream.Length));
+                    break;
+                }
                 case TDSMessageType.SQLBatch:
-                    {
-                        // Create and inflate SQL batch token
-                        Add(new TDSSQLBatchToken(_dataStream));
-                        break;
-                    }
+                {
+                    // Create and inflate SQL batch token
+                    Add(new TDSSQLBatchToken(_dataStream));
+                    break;
+                }
                 case TDSMessageType.Attention:
-                    {
-                        // Do nothing
-                        break;
-                    }
+                {
+                    // Do nothing
+                    break;
+                }
                 case TDSMessageType.FederatedAuthenticationToken:
-                    {
-                        Add(new TDSFedAuthToken(_dataStream));
-                        break;
-                    }
+                {
+                    Add(new TDSFedAuthToken(_dataStream));
+                    break;
+                }
                 case TDSMessageType.RPC:
                 {
                     Add(new TDSRPCRequestToken(_dataStream));
+                    break;
+                }
+                case TDSMessageType.BulkLoad:
+                {
+                    Add(new TDSBulkLoadToken(_dataStream));
                     break;
                 }
                 case TDSMessageType.TransactionManager:
@@ -332,10 +338,11 @@ namespace Microsoft.SqlServer.TDS
                     break;
                 }
                 default:
-                    {
-                        // We don't recognize this message type
-                        throw new NotImplementedException(string.Format("Inflation for {0} TDS message is not implemented", MessageType));
-                    }
+                {
+                    // We don't recognize this message type
+                    throw new NotImplementedException(string.Format("Inflation for {0} TDS message is not implemented",
+                        MessageType));
+                }
             }
 
             // Inflation is complete so we should release the stream

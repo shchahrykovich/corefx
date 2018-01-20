@@ -67,49 +67,54 @@ namespace Microsoft.SqlServer.TDS.EndPoint
                 switch (MessageBeingReceived.MessageType)
                 {
                     case TDSMessageType.PreLogin:
-                        {
-                            // Call into the subscriber to process the packet
-                            responseMessages = Server.OnPreLoginRequest(Session, MessageBeingReceived);
-                            break;
-                        }
+                    {
+                        // Call into the subscriber to process the packet
+                        responseMessages = Server.OnPreLoginRequest(Session, MessageBeingReceived);
+                        break;
+                    }
                     case TDSMessageType.TDS7Login:
+                    {
+                        // Call into the subscriber to process the packet
+                        responseMessages = Server.OnLogin7Request(Session, MessageBeingReceived);
+
+                        // Check if encryption needs to be turned off
+                        if (Session.Encryption == TDSEncryptionType.LoginOnly)
                         {
-                            // Call into the subscriber to process the packet
-                            responseMessages = Server.OnLogin7Request(Session, MessageBeingReceived);
-
-                            // Check if encryption needs to be turned off
-                            if (Session.Encryption == TDSEncryptionType.LoginOnly)
-                            {
-                                // Disable transport encryption
-                                DisableTransportEncryption();
-                            }
-
-                            break;
+                            // Disable transport encryption
+                            DisableTransportEncryption();
                         }
+
+                        break;
+                    }
                     case TDSMessageType.SSPI:
-                        {
-                            // Call into the subscriber to process the packet
-                            responseMessages = Server.OnSSPIRequest(Session, MessageBeingReceived);
-                            break;
-                        }
+                    {
+                        // Call into the subscriber to process the packet
+                        responseMessages = Server.OnSSPIRequest(Session, MessageBeingReceived);
+                        break;
+                    }
                     case TDSMessageType.SQLBatch:
-                        {
-                            // Call into the subscriber to process the packet
-                            responseMessages = Server.OnSQLBatchRequest(Session, MessageBeingReceived);
-                            break;
-                        }
+                    {
+                        // Call into the subscriber to process the packet
+                        responseMessages = Server.OnSQLBatchRequest(Session, MessageBeingReceived);
+                        break;
+                    }
                     case TDSMessageType.Attention:
-                        {
-                            // Call into the subscriber to process the packet
-                            responseMessages = Server.OnAttention(Session, MessageBeingReceived);
-                            break;
-                        }
+                    {
+                        // Call into the subscriber to process the packet
+                        responseMessages = Server.OnAttention(Session, MessageBeingReceived);
+                        break;
+                    }
                     case TDSMessageType.FederatedAuthenticationToken:
-                        {
-                            // Call into the subscriber to process the packet
-                            responseMessages = Server.OnFederatedAuthenticationTokenMessage(Session, MessageBeingReceived);
-                            break;
-                        }
+                    {
+                        // Call into the subscriber to process the packet
+                        responseMessages = Server.OnFederatedAuthenticationTokenMessage(Session, MessageBeingReceived);
+                        break;
+                    }
+                    case TDSMessageType.BulkLoad:
+                    {
+                        responseMessages = Server.OnBulkRequest(Session, MessageBeingReceived);
+                        break;
+                    }
                     case TDSMessageType.RPC:
                     {
                         // Call into the subscriber to process the packet
@@ -123,10 +128,11 @@ namespace Microsoft.SqlServer.TDS.EndPoint
                         break;
                     }
                     default:
-                        {
-                            // New code is needed to process this message
-                            throw new NotImplementedException(string.Format("Handler of TDS message \"{0}\" is not implemented", MessageBeingReceived.MessageType));
-                        }
+                    {
+                        // New code is needed to process this message
+                        throw new NotImplementedException(string.Format(
+                            "Handler of TDS message \"{0}\" is not implemented", MessageBeingReceived.MessageType));
+                    }
                 }
 
                 // Check if TDS packet size changed

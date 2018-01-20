@@ -68,5 +68,7 @@ namespace Microsoft.SqlServer.TDS.EndPoint
         TDSMessageCollection OnRPCRequest(ITDSServerSession session, TDSMessage message);
 
         TDSMessageCollection OnTransactionManagerRequest(ITDSServerSession session, TDSMessage message);
+
+        TDSMessageCollection OnBulkRequest(ITDSServerSession session, TDSMessage messageBeingReceived);
     }
 }
