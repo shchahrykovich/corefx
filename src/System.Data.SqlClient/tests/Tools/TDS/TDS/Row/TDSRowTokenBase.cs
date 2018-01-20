@@ -380,9 +380,13 @@ namespace Microsoft.SqlServer.TDS.Row
                             throw new NotImplementedException();
                         }
 
-                        var result = TDSUtilities.ReadString(source, (ushort)actualLength);
+                        var result = TDSUtilities.ReadString(source, (ushort)(actualLength - 2));
 
-                        var b = TDSUtilities.ReadUShort(source);
+                        // End line
+                        TDSUtilities.ReadUShort(source);
+
+                        // Next chunk?
+                        TDSUtilities.ReadUShort(source);
                         
                         return result;
                     }
@@ -573,6 +577,14 @@ namespace Microsoft.SqlServer.TDS.Row
 
                             // Long data
                             TDSUtilities.WriteULong(destination, unchecked((ulong)(long)data));
+                        }
+                        else if (data is ulong)
+                        {
+                            // One-byte data
+                            destination.WriteByte(8);
+
+                            // Integer data
+                            TDSUtilities.WriteULong(destination, (ulong)data);
                         }
                         else
                         {
